@@ -1,13 +1,16 @@
 ---
-layout: home
+layout: single
 author_profile: true
+title: "About Me"
 ---
 
-Welcome to my blog on **AlphaFold and protein structure prediction**.
+Hi, I’m Radu.
 
-I write about:
-- Protein folding theory  
-- Multiple Sequence Alignments (MSAs)  
-- Coevolution  
-- Geometry-aware attention  
-- AlphaFold 2 and AlphaFold 3  
+I am interested in deep learning and its application to scientific problems, particularly protein structure prediction and systems like AlphaFold.
+
+This blog accompanies my deep learning seminar and documents my exploration of:
+
+- Protein folding  
+- Evolutionary constraints  
+- Geometry-aware neural networks  
+- Scientific AI systems 
