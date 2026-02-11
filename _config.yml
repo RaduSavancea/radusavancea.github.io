@@ -1,3 +1,33 @@
-title: AlphaFold
-description: Deep learning and protein structure prediction
-theme: minima
+title: "AlphaFold Blog"
+name: "Radu Savancea"
+description: "Deep learning and protein structure prediction"
+
+remote_theme: "mmistakes/minimal-mistakes"
+
+plugins:
+  - jekyll-include-cache
+
+minimal_mistakes_skin: "default"   # try "air", "dark", "mint" later if you want
+
+author:
+  name: "Radu Savancea"
+  bio: "Deep learning & structural biology"
+  location: "Your Location"
+  avatar: "/assets/images/profile.jpg"
+
+  links:
+    - label: "GitHub"
+      icon: "fab fa-github"
+      url: "https://github.com/radusavancea"
+
+    - label: "LinkedIn"
+      icon: "fab fa-linkedin"
+      url: "https://www.linkedin.com/in/radu-mihai-savancea-6a653826b/"
+    
+    - label: "Email"
+      icon: "fas fa-envelope"
+      url: "st195720@stud.uni-stuttgart.de"
+
+
+markdown: kramdown
+highlighter: rouge
