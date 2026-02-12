@@ -5,7 +5,6 @@ layout: single
 date: 2026-02-12
 author_profile: true
 classes: wide
-math: true
 categories: [AlphaFold]
 tags: [Protein Folding, Evoformer, Geometry, MSA, CASP]
 ---
