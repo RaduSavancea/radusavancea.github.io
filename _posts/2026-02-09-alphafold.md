@@ -1,7 +1,7 @@
 ---
 title: "AlphaFold — A Deep Learning Breakthrough in Protein Structure Prediction"
 layout: single
-date: 2026-02-26
+date: 2026-02-12
 author_profile: true
 math: true
 categories: [AlphaFold]
