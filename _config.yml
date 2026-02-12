@@ -7,7 +7,7 @@ remote_theme: "mmistakes/minimal-mistakes"
 plugins:
   - jekyll-include-cache
 
-minimal_mistakes_skin: "default"   # try "air", "dark", "mint" later if you want
+minimal_mistakes_skin: "default"
 
 author:
   name: "Radu Savancea"
@@ -26,16 +26,14 @@ author:
     
     - label: "Email"
       icon: "fas fa-envelope"
-      url: "st195720@stud.uni-stuttgart.de"
-
+      url: "mailto:st195720@stud.uni-stuttgart.de"
 
 markdown: kramdown
-
-kramdown:
-  input: GFM
-  math_engine: mathjax
-  math_engine_opts:
-    preview: true
-
 highlighter: rouge
-mathjax: true
+
+# Enable math for Minimal Mistakes
+enable_math: true
+
+
+head_scripts:
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js
