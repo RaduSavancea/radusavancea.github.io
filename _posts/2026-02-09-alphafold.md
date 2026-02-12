@@ -2,7 +2,8 @@
 title: "AlphaFold — A Deep Learning Breakthrough in Protein Structure Prediction"
 layout: single
 date: 2026-02-12
-author_profile: true
+author_profile: false
+classes: wide
 math: true
 categories: [AlphaFold]
 tags: [Protein Folding, Evoformer, Geometry, MSA, CASP]
@@ -45,7 +46,8 @@ Proteins have four structural levels:
 3. **Tertiary** — full 3D fold  
 4. **Quaternary** — multi-chain complexes  
 
-![Protein Structure Levels](/assets/images/protein_levels.png)
+![Protein Structure Levels]({{ "/assets/images/protein_levels.png"|relative_url }})
+
 
 Folding transforms a linear sequence into a functional 3D structure.
 
