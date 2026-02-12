@@ -32,7 +32,7 @@ Each amino acid consists of:
 
 There are **20 standard amino acids**, each defined by its side chain.
 
-![Amino Acid Structure](/assets/images/amino_acid.png)
+![Amino Acid Structure]({{ "/assets/images/amino_acid.png" | relative_url }})
 
 ---
 
