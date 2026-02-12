@@ -1,5 +1,3 @@
-{% if page.math %}
-<script>
 window.MathJax = {
   tex: {
     inlineMath: [['\\(','\\)']],
@@ -7,6 +5,3 @@ window.MathJax = {
   },
   svg: { fontCache: 'global' }
 };
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-{% endif %}
