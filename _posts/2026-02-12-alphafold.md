@@ -9,7 +9,7 @@ categories: [AlphaFold]
 tags: [Protein Folding, Evoformer, Geometry, MSA, CASP]
 ---
 
-## AlphaFold — A Breakthrough in Biomolecular AI
+## Introduction
 
 In this blog post, we cover the fundamental concepts of protein folding and the most important architectural components behind AlphaFold 2 and AlphaFold 3.
 
@@ -79,6 +79,26 @@ Understanding protein folding is therefore central to medicine, drug discovery, 
 
 ---
 
+## Why Is Protein Folding Important?
+
+Protein misfolding is linked to numerous diseases. For example, the accumulation of misfolded amyloid proteins plays a central role in **Alzheimer’s disease**, while structural abnormalities in regulatory proteins are associated with various forms of **cancer**. When proteins fail to adopt their correct three-dimensional conformation, they can lose functionality or become toxic to cells.
+
+Understanding protein folding is therefore central to several major scientific and industrial fields. In **medicine**, structural insight enables the identification of disease mechanisms at the molecular level. In **drug discovery**, knowledge of a protein’s three-dimensional structure allows researchers to design molecules that precisely bind to active or regulatory sites. In **biotechnology**, engineered proteins with specific structural properties can be developed for industrial enzymes, synthetic biology applications, or targeted therapies.
+
+Improved insight into folding mechanisms directly supports the development of new pharmaceuticals. By understanding how proteins fold and interact, researchers can predict binding interfaces, stabilize unstable proteins, and design inhibitors that block harmful interactions.
+
+Moreover, protein structures help interpret **genetic variation and mutations**. Many mutations do not simply change a sequence — they alter structural stability or binding behavior. Structure prediction therefore helps explain why certain mutations are pathogenic while others are benign.
+
+<figure style="text-align: center;">
+  <img src="{{ '/assets/images/AF-Q8W3K0-F1.png' | relative_url }}" alt="Predicted protein structure example" width="500">
+  <figcaption><strong>Figure 3:</strong> Example of a predicted protein structure (Q8W3K0 — plant disease resistance protein) from the AlphaFold Protein Structure Database.</figcaption>
+</figure>
+
+The ability to computationally predict accurate protein structures at scale fundamentally changes how we approach biology, medicine, and molecular engineering.
+
+
+---
+
 ## Levinthal’s Paradox
 
 The complexity of protein folding becomes evident when considering the astronomical number of possible conformations a protein chain could theoretically adopt.
@@ -139,6 +159,13 @@ Conceptually, the system operates in two major stages:
 1. **Relational reasoning in representation space (Evoformer)**
 2. **Geometric realization in 3D space (Structure Module)**
 
+
+
+<figure style="text-align: center;">
+  <img src="{{ '/assets/images/Fold2_Archi.PNG' | relative_url }}" width="750">
+  <figcaption><strong>Figure 1:</strong> Complete AlphaFold 2 pipeline (Jumper et al., 2021).</figcaption>
+</figure>
+
 ---
 
 ## Input Feature Extraction
@@ -169,6 +196,11 @@ where:
 The MSA captures **evolutionary constraints**. If mutations at position \( i \) correlate with mutations at position \( j \), this co-evolution signal suggests structural coupling between residues.
 
 Evolution therefore provides indirect supervision for 3D structure.
+
+<figure style="text-align: center;">
+  <img src="{{ '/assets/images/MSA.PNG' | relative_url }}" width="650">
+  <figcaption><strong>Figure 2:</strong> Multiple Sequence Alignment capturing evolutionary variation.</figcaption>
+</figure>
 
 ---
 
@@ -204,6 +236,11 @@ Within each block:
 Stacking many Evoformer blocks allows the network to progressively refine its internal hypothesis of the protein fold. The relational representation becomes increasingly geometric and globally consistent with depth.
 
 Conceptually, the Evoformer behaves like a learned constraint solver operating over a dense residue graph enriched with evolutionary evidence.
+
+<figure style="text-align: center;">
+  <img src="{{ '/assets/images/EvoFormer.PNG' | relative_url }}" width="700">
+  <figcaption><strong>Figure 3:</strong> Evoformer architecture showing MSA attention and pair updates.</figcaption>
+</figure>
 
 ---
 
@@ -274,6 +311,12 @@ The Structure Module is designed to be **SE(3)-equivariant**, meaning:
 
 - Rotating or translating the entire protein does not change internal decisions  
 - Predictions transform consistently under rigid-body motion  
+
+<figure style="text-align: center;">
+  <img src="{{ '/assets/images/Structure_Module.PNG' | relative_url }}" width="650">
+  <figcaption><strong>Figure 4:</strong> Structure module translating relational embeddings into 3D frames.</figcaption>
+</figure>
+
 
 ---
 
@@ -397,3 +440,268 @@ This separation between high-dimensional relational reasoning and geometric inst
 
 It marked the moment when deep learning transformed structural biology from a decades-long grand challenge into a tractable computational problem.
 
+
+# AlphaFold 3 — From Folding to Generative Molecular Modeling
+
+AlphaFold 3 represents a fundamental architectural shift compared to AlphaFold 2.  
+While AlphaFold 2 solved protein folding through deterministic equivariant refinement of residue frames, AlphaFold 3 generalizes structure prediction into a unified, generative model of full biomolecular systems.
+
+Instead of predicting a single rigidly refined protein structure, AlphaFold 3 models:
+
+- Proteins  
+- DNA and RNA  
+- Small-molecule ligands  
+- Metal ions  
+- Covalent modifications  
+
+within one shared architecture. Folding and binding are no longer separate tasks — structure and interaction are predicted jointly.
+
+This transition required a conceptual change: from geometric constraint solving to probabilistic generative modeling.
+
+---
+
+# A Unified Molecular Representation
+
+AlphaFold 2 operated primarily at the residue level. AlphaFold 3 instead introduces a unified token space where every molecular component is represented consistently.
+
+If a system contains \( N \) total molecular units (residues, atoms, bases, ions), the model constructs:
+
+$$
+\text{Single} \in \mathbb{R}^{N \times c}
+$$
+
+$$
+\text{Pair} \in \mathbb{R}^{N \times N \times c_p}
+$$
+
+The single representation stores per-token features, while the pair representation stores relational information between all token pairs.
+
+Unlike AlphaFold 2, no assumption is made that tokens correspond only to amino acid residues. This unified representation enables modeling heterogeneous complexes directly.
+
+---
+
+# The Pairformer
+
+The Evoformer trunk of AlphaFold 2 is replaced by the **Pairformer** in AlphaFold 3.  
+
+The Pairformer jointly updates token embeddings and pair embeddings through attention and message passing.
+
+Attention between tokens \( i \) and \( j \) is computed as:
+
+$$
+\mathrm{score}(i,j)
+=
+Q_i \cdot K_j
++
+b_{ij}
+$$
+
+where
+
+$$
+Q_i = W_Q s_i,
+\qquad
+K_j = W_K s_j
+$$
+
+and the pair bias is derived from the pair representation:
+
+$$
+b_{ij} = W_b z_{ij}
+$$
+
+This formulation integrates relational reasoning directly into attention.
+
+Pair embeddings are updated alongside token embeddings using learned transformations such as:
+
+$$
+z_{ij}
+\leftarrow
+\mathrm{MLP}(z_{ij}, s_i, s_j)
+$$
+
+Unlike AlphaFold 2, there are no explicit triangle attention modules.  
+Relational consistency is instead learned implicitly through the diffusion objective.
+
+---
+
+# Diffusion-Based Structure Generation
+
+The most significant architectural innovation of AlphaFold 3 is the introduction of diffusion modeling for structure generation.
+
+Rather than refining rigid-body frames, the model directly generates atomic coordinates.
+
+---
+
+## Forward Diffusion Process (Training)
+
+During training, clean coordinates
+
+$$
+x_0 \in \mathbb{R}^{3N}
+$$
+
+are progressively corrupted with Gaussian noise:
+
+$$
+x_t
+=
+\sqrt{\alpha_t} \, x_0
++
+\sqrt{1 - \alpha_t} \, \epsilon
+$$
+
+where
+
+$$
+\epsilon \sim \mathcal{N}(0, I)
+$$
+
+and \( t \) denotes the diffusion timestep.
+
+As \( t \) increases, the structure becomes increasingly noisy.
+
+---
+
+## Noise Prediction Objective
+
+The model learns to predict the added noise:
+
+$$
+\hat{\epsilon}_\theta(x_t, t, \text{context})
+$$
+
+The training objective minimizes:
+
+$$
+\mathcal{L}
+=
+\mathbb{E}_{x_0, \epsilon, t}
+\left[
+\|
+\epsilon
+-
+\hat{\epsilon}_\theta(x_t, t)
+\|^2
+\right]
+$$
+
+The context includes:
+
+- Token embeddings from the Pairformer  
+- Pair embeddings  
+- Molecular identity features  
+- Optional template information  
+
+---
+
+## Reverse Diffusion (Inference)
+
+At inference time, the process is reversed.
+
+We begin with pure Gaussian noise:
+
+$$
+x_T \sim \mathcal{N}(0, I)
+$$
+
+Coordinates are iteratively updated via learned denoising steps:
+
+$$
+x_{t-1}
+=
+\frac{1}{\sqrt{\alpha_t}}
+\left(
+x_t
+-
+\frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}}
+\hat{\epsilon}_\theta(x_t, t)
+\right)
++
+\sigma_t z
+$$
+
+where
+
+$$
+z \sim \mathcal{N}(0, I)
+$$
+
+After sufficient iterations, the final structure \( x_0 \) is obtained.
+
+---
+
+# Conformer Generation and Chemical Priors
+
+Ligands and flexible molecules introduce additional challenges due to internal torsional freedom.
+
+AlphaFold 3 therefore generates chemically valid conformers prior to diffusion. These conformers respect:
+
+- Fixed bond lengths  
+- Bond angles  
+- Allowed torsion states  
+
+They provide plausible internal geometries, but remain flexible during diffusion.
+
+This differs from AlphaFold 2, which predicted torsion angles explicitly and relied on rigid residue frames.
+
+---
+
+# Geometric Consistency and Equivariance
+
+AlphaFold 2 enforced SE(3)-equivariance explicitly through rigid-body frames and invariant point attention.
+
+AlphaFold 3 instead learns geometric consistency statistically.
+
+If coordinates are globally rotated by \( R \), the model learns to satisfy approximately:
+
+$$
+\hat{\epsilon}_\theta(R x_t)
+=
+R \, \hat{\epsilon}_\theta(x_t)
+$$
+
+Equivariance is not hard-coded through rigid-body updates but emerges from training on 3D structures.
+
+Geometric inconsistencies increase diffusion loss, pushing the model toward physically valid configurations.
+
+---
+
+# Sampling and Structural Ensembles
+
+Because diffusion is stochastic, different random initializations:
+
+$$
+x_T \sim \mathcal{N}(0, I)
+$$
+
+produce different valid structures.
+
+This enables:
+
+- Sampling alternative conformations  
+- Modeling flexible binding modes  
+- Representing uncertainty  
+- Generating structural ensembles  
+
+Unlike AlphaFold 2, which produces largely deterministic outputs, AlphaFold 3 naturally models structural variability.
+
+---
+
+# Conceptual Comparison with AlphaFold 2
+
+AlphaFold 2 can be summarized as:
+
+- Deterministic  
+- Residue-centric  
+- Explicit geometric reasoning  
+- Rigid-body equivariant refinement  
+
+AlphaFold 3 is:
+
+- Generative  
+- Atom-centric and multi-molecular  
+- Diffusion-based  
+- Unified interaction modeling  
+
+If AlphaFold 2 acts as a geometric constraint solver, AlphaFold 3 behaves as a learned molecular simulator guided by relational context.
