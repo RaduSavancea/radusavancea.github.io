@@ -19,4 +19,4 @@ This blog documents my learning journey in deep learning and related areas. It s
 - Biological generative AI  
 - Mathematical foundations of modern AI systems  
 
-My first post accompanies my deep learning seminar and explores the key ideas behind AlphaFold.
+My first post accompanies my deep learning seminar and explores the key ideas behind AlphaFold. df
