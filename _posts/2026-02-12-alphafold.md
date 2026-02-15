@@ -177,12 +177,12 @@ Rather than predicting structure directly from physics-based simulation, AlphaFo
 
 Conceptually, the system operates in two major stages:
 
-1. **Relational reasoning in representation space (Evoformer)**
-2. **Geometric realization in 3D space (Structure Module)**
+1. **Relational reasoning within the representation space (Evoformer)**
+2. **Geometric reconstruction in 3D space (Structure Module)**
 
 <figure style="text-align: center;">
   <img src="{{ '/assets/images/Fold2_Archi.PNG' | relative_url }}" width="750">
-  <figcaption><strong>Figure 1:</strong> Complete AlphaFold 2 pipeline (Jumper et al., 2021).</figcaption>
+  <figcaption><strong>Figure 4:</strong> Complete AlphaFold 2 pipeline (Jumper et al., 2021).</figcaption>
 </figure>
 
 ---
@@ -200,7 +200,7 @@ These two representations form the foundation of the entire architecture.
 
 ### Multiple Sequence Alignment (MSA)
 
-Starting from the target sequence, AlphaFold performs a large-scale database search to retrieve homologous sequences from diverse species. These sequences are arranged in a two-dimensional table called a **Multiple Sequence Alignment (MSA)**, where:
+Starting from the target sequence, AlphaFold performs a large-scale database lookup to retrieve homologous sequences from diverse species. These sequences are arranged in a matrix called a **Multiple Sequence Alignment (MSA)**, where:
 
 - Each row corresponds to a homologous protein sequence  
 - Each column corresponds to a specific residue position  
@@ -214,65 +214,41 @@ This alignment encodes powerful evolutionary signals:
 
 Intuitively, if two residues participate in a bonding mechanism, mutating one without compensating changes would destabilize the protein. Therefore, correlated mutations preserve structural integrity <sup><a href="#ref4">[4]</a></sup>.
 
-The alignment is embedded into a tensor:
+The matrix allignments are embedded into a 3D tensor:
 
 $$
-\mathrm{MSA} \in \mathbb{R}^{N_{\text{seq}} \times N \times c_m}
+\begin{aligned}
+\mathrm{MSA} &\in \mathbb{R}^{N_{\text{seq}} \times N \times c_m} \\
+N_{\text{seq}} &:\ \text{number of aligned sequences} \\
+N &:\ \text{number of residues in the protein} \\
+c_m &:\ \text{embedding dimension}
+\end{aligned}
 $$
-
-where
-
-$$
-N_{\text{seq}} \text{ is the number of aligned sequences,}
-$$
-
-$$
-N \text{ is the number of residues contained in the protein,}
-$$
-
-$$
-c_m \text{ is the embedding dimension.}
-$$
-
 
 This tensor does not explicitly encode distances. Instead, it encodes **evolutionary constraints**, from which geometric structure can be inferred.
 
 Evolution therefore acts as indirect supervision for 3D structure prediction.
 
 <figure style="text-align: center;">
-  <img src="{{ '/assets/images/MSA.PNG' | relative_url }}" width="650">
-  <figcaption><strong>Figure 2:</strong> Multiple Sequence Alignment capturing evolutionary conservation and co-evolution signals.</figcaption>
+  <img src="{{ '/assets/images/Coevolution.JPG' | relative_url }}" width="650">
+  <figcaption><strong>Figure 5:</strong> Multiple Sequence Alignment capturing evolutionary conservation and co-evolution signals.</figcaption>
 </figure>
 
 ---
 
 ### Pair Representation
 
-While the MSA captures evolutionary variation, protein structure itself is fundamentally about **relationships between residues**.
-
-To explicitly reason about residue–residue interactions, AlphaFold maintains a second tensor:
-
+While the MSA captures evolutionary variation, protein structure itself is fundamentally about **relationships between residues**. To reason explicitly about residue–residue interactions, AlphaFold maintains a second tensor:
 
 $$
 \mathrm{Pair} \in \mathbb{R}^{N \times N \times c_z}
 $$
 
-Each element is a learned feature vector encoding the model’s current belief about how residues *i* and *j* relate geometrically.
+Each element of this tensor is a learned feature vector encoding the model’s current belief about how residues *i* and *j* relate geometrically.
 
+This representation can be interpreted as a complete graph over residues: each residue corresponds to a node, and every pair of residues is connected by an edge that stores relational features. Unlike classical contact maps, however, the Pair representation does not explicitly encode distances. Instead, it maintains a high-dimensional latent representation capable of supporting flexible geometric reasoning.
 
-This tensor can be interpreted as a **complete graph over residues**, where:
-
-- Nodes correspond to residues  
-- Edges store relational features  
-
-Unlike classical contact maps, this representation does not explicitly store distances. Instead, it stores a high-dimensional latent encoding capable of supporting geometric reasoning.
-
-Together, the MSA tensor and the Pair tensor provide two complementary perspectives:
-
-- The MSA captures evolutionary constraints across species.
-- The Pair representation captures geometric relationships within a single protein.
-
-The Evoformer iteratively refines both representations, allowing evolutionary signals to shape geometric reasoning before any 3D coordinates are predicted.
+Together, the MSA tensor and the Pair tensor provide complementary perspectives. The MSA captures evolutionary constraints across species, whereas the Pair representation models geometric relationships within a single protein. The Evoformer iteratively refines both representations, allowing evolutionary signals to shape geometric reasoning before any three-dimensional coordinates are predicted.
 
 
 ---
@@ -281,119 +257,102 @@ The Evoformer iteratively refines both representations, allowing evolutionary si
 
 The Evoformer is the core reasoning engine of AlphaFold 2. It consists of a deep stack of blocks (48 in total) that iteratively refine both the MSA and pair representations.
 
-Within each block:
+Within each block, two complementary processes take place:
 
-- Row and column attention refine MSA features  
-- Triangle updates refine pairwise relationships  
-- Information flows bidirectionally between the two representations  
+- Evolutionary information is refined through axial attention (row-wise and column-wise) in the MSA stack  
+- Geometric relationships are refined through triangle updates in the pair stack, that respect the triangle inequality  
 
-Stacking many Evoformer blocks allows the network to progressively refine its internal hypothesis of the protein fold. The relational representation becomes increasingly geometric and globally consistent with depth.
+Crucially, information flows bidirectionally between these two representations. 
 
-Conceptually, the Evoformer behaves like a learned constraint solver operating over a dense residue graph enriched with evolutionary evidence.
+The Evoformer can be seen as a learned system that reasons over a network of residues connected by evolutionary information. By refining this network step by step, it turns patterns found in evolution into a consistent internal model of the protein’s 3D structure and lays the basis representation for the later structure prediction.
 
 <figure style="text-align: center;">
-  <img src="{{ '/assets/images/EvoFormer.PNG' | relative_url }}" width="700">
-  <figcaption><strong>Figure 3:</strong> Evoformer architecture showing MSA attention and pair updates.</figcaption>
+  <img src="{{ '/assets/images/Evo.JPG' | relative_url }}" width="700">
+  <figcaption><strong>Figure 6:</strong> Evoformer architecture showing MSA attention and pair updates.</figcaption>
 </figure>
 
 ---
 
-### Row-wise Attention — Unfolding Along Residues
+## Axial Attention in the MSA Stack
 
-In row attention, we fix a particular sequence and look across its residues.
+Applying full attention over the entire tensor would be computationally infeasible. Instead, AlphaFold factorizes attention along individual tensor modes after unfolding them, technique known as **axial attention**.
 
-Conceptually:
+This means attention is applied along one axis at a time:
 
-- We take one row of the MSA  
-- That row has shape  
+- Along residues (row-wise attention)  
+- Along sequences (column-wise attention)  
 
-$$
-N \times c_m
-$$
-
-- We apply standard self-attention across the residue axis  
-
-This captures how residues within a single protein chain influence each other — including long-range interactions between distant amino acids.
-
-Importantly, this attention is **biased by the pair representation**.
-
-The pair tensor provides prior relational knowledge about which residue pairs are likely to interact. This information is injected into the attention logits as a bias term.
-
-So row attention is not purely sequence-based. It is informed by evolving geometric hypotheses stored in the pair tensor.
-
-In summary, row attention answers:
-
-> Given this specific protein sequence, how do its residues interact with each other?
-
----
-
-### Column-wise Attention — Unfolding Along Sequences
-
-In column attention, we fix a residue position and look across all homologous sequences.
-
-Conceptually:
-
-- We take one column of the MSA  
-- That column has shape  
-
-$$
-N_{\text{seq}} \times c_m
-$$
-
-- We apply self-attention across the sequence axis  
-
-This allows the model to reason about evolutionary variation at a specific residue position.
-
-Column attention captures:
-
-- Conservation signals  
-- Mutation patterns  
-- Co-evolutionary statistics  
-
-In other words, it models how a single structural position behaves across evolutionary time.
-
-Row attention integrates structural interactions within a sequence, while column attention integrates evolutionary statistics across sequences.
-
----
-
-### Why Axial Attention?
-
-If we attempted full attention over the entire MSA tensor, the computational cost would scale quadratically with the total number of elements:
+This factorization reduces computational complexity from
 
 $$
 \mathcal{O}((N_{\text{seq}} \cdot N)^2)
 $$
 
-This would be intractable.
-
-Axial attention reduces complexity by factorizing attention along individual modes:
+to
 
 $$
 \mathcal{O}(N_{\text{seq}} \cdot N^2 + N \cdot N_{\text{seq}}^2)
 $$
 
-This makes training feasible while preserving expressive power.
+making large MSAs tractable while preserving expressive power.
 
 ---
 
-### Triangle Updates: Enforcing Geometric Consistency
+### Row-wise Attention — Structural Reasoning Within a Sequence
 
-Pairwise residue predictions alone cannot guarantee a globally consistent 3D structure.
+In row-wise attention, a single sequence is considered while attention is applied across its residue positions. One row of the MSA, with shape
 
-If residue *i* is close to *k*, and *k* is close to *j*, then *i* cannot be arbitrarily far from *j*. In Euclidean space, distances must satisfy:
+$$
+N \times c_m
+$$
+
+is selected, and self-attention is applied along the residue axis.
+
+This operation captures long-range interactions between residues within a single protein chain.
+
+Importantly, row-wise attention is **biased by the pair representation**. The pair tensor provides relational information about which residue pairs are likely to interact. This information is incorporated into the attention logits as an additive bias term. As a result, residue interactions are not inferred purely from sequence context but are guided by evolving geometric hypotheses.
+
+Row-wise attention therefore integrates structural reasoning within a single sequence.
+
+---
+
+### Column-wise Attention — Evolutionary Reasoning Across Sequences
+
+In column-wise attention, a single residue position is fixed while attention is applied across homologous sequences.
+
+A column of the MSA, with shape
+
+$$
+N_{\text{seq}} \times c_m
+$$
+
+is selected, and self-attention is applied along the sequence axis.
+
+This mechanism captures evolutionary variation at a specific residue position. Signals such as conservation, mutation patterns and co-evolutionary statistics are integrated.
+
+Column-wise attention therefore models how a structural position behaves across evolutionary time.
+
+Together, row and column attention allow the Evoformer to extract meaningful information from evolution process while simultaneously organizing them along the protein chain.
+
+---
+
+## Triangle Updates: Enforcing Geometric Consistency
+
+While axial attention extracts evolutionary constraints, it does not by itself guarantee geometric consistency. This is why the triangular updates try to enforce geomerty into the model.
+
+If residue *i* is predicted to be close to residue *k*, and residue *k* is close to residue *j*, then residue *i* cannot be arbitrarily far from residue *j*. In Euclidean space, distances must satisfy:
 
 $$
 d(i,j) \le d(i,k) + d(k,j)
 $$
 
-AlphaFold does not enforce this constraint explicitly. Instead, it introduces **triangle updates** in the pair representation so that geometric consistency can emerge naturally.
+AlphaFold does not hard-code this constraint into the loss function. Instead, it introduces **triangle updates** within the pair representation so that such consistency can emerge naturally.
 
 ---
 
-#### Triangle Attention
+### Triangle Attention
 
-The pair tensor can be interpreted as a complete graph over residues.  
-Each edge stores a learned embedding describing how two residues relate.
+The pair tensor can be interpreted as a complete graph over residues, where each edge stores a learned embedding describing the relationship between two residues.
 
 To update the relationship between residues *i* and *j*, the model considers all possible third residues *k*. In other words, it reasons over triangles (*i*, *j*, *k*).
 
@@ -418,20 +377,20 @@ z'_{ij}
 \sum_k \alpha_{ijk} V_{jk}
 $$
 
-Intuitively, residue *k* acts as a mediator between *i* and *j*.  
-If both (*i*, *k*) and (*j*, *k*) strongly suggest compatibility, this influences the updated belief about (*i*, *j*).
+Residue *k* therefore acts as a mediator between *i* and *j*. If both (*i*, *k*) and (*j*, *k*) suggest compatibility, this influences the updated belief about (*i*, *j*).
 
-AlphaFold applies this mechanism symmetrically (around both starting and ending nodes), ensuring that information flows consistently across the triangle.
+A symmetric variant ensures that information flows consistently around both orientations of the triangle.
 
 ---
 
 ### Why This Matters
 
-Triangle attention allows local pairwise predictions to become globally coherent. Instead of predicting each residue pair independently, the model refines relationships by checking their compatibility with surrounding residues.
+Triangle attention allows local pairwise predictions to become globally coherent. Instead of treating each residue pair independently, the model checks their compatibility with surrounding residues.
 
-No hard geometric rule is imposed. Instead, inconsistent relational patterns increase downstream structural error, and gradients flow back through these triangle updates to restore consistency.
+No explicit geometric rule is imposed. Instead, geometry is enforced through the way in which the attention mecanishm is built, encouraging the pair representation to become geometrically consistent.
 
-Together with axial attention in the MSA stack, triangle updates transform evolutionary signals into a globally consistent relational structure — before any 3D coordinates are ever predicted.
+In combination, axial attention extracts evolutionary constraints, and triangle updates enforce their geometric compatibility. Through repeated stacking of Evoformer blocks, statistical signals are gradually transformed into a globally consistent geometric-aware representations, ready to be realized as three-dimensional structure.
+
 
 
 ---
