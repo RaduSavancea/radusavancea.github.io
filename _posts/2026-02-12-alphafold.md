@@ -220,8 +220,6 @@ $$
 \mathrm{MSA} \in \mathbb{R}^{N_{\text{seq}} \times N \times c_m}
 $$
 
-where:
-
 where
 
 $$
@@ -254,11 +252,13 @@ While the MSA captures evolutionary variation, protein structure itself is funda
 
 To explicitly reason about residue–residue interactions, AlphaFold maintains a second tensor:
 
+
 $$
 \mathrm{Pair} \in \mathbb{R}^{N \times N \times c_z}
 $$
 
-Each element $\mathrm{Pair}[i,j]$ is a learned feature vector encoding the model’s current belief about how residues $i$ and $j$ relate geometrically.
+Each element \( \mathrm{Pair}[i,j] \) is a learned feature vector encoding the model’s current belief about how residues \( i \) and \( j \) relate geometrically.
+
 
 This tensor can be interpreted as a **complete graph over residues**, where:
 
@@ -681,7 +681,7 @@ $$
 z \sim \mathcal{N}(0, I)
 $$
 
-After sufficient iterations, the final structure \( x_0 \) is obtained.
+After sufficient iterations, the final structure is obtained.
 
 ---
 
