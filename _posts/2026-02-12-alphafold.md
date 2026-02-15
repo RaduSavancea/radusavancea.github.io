@@ -11,11 +11,11 @@ tags: [Protein Folding, Evoformer, Geometry, MSA, CASP]
 
 ## Introduction
 
-In this blog post, we cover the fundamental concepts of protein folding and the most important architectural components behind AlphaFold 2 and AlphaFold 3.
+This blog post explores the fundamental concepts of protein folding and the key architectural components behind AlphaFold 2 and AlphaFold 3.
 
-AlphaFold represents a pivotal achievement in biological AI, particularly in **3D protein structure prediction**. The work led to Nobel Prize recognition for **Demis Hassabis**, leader of the AlphaFold project, and **John Jumper**, for groundbreaking contributions to computational biology and protein folding prediction.
+AlphaFold represents a pivotal achievement in biological AI, particularly in **3D protein structure prediction**. The work led to the 2024 Nobel Prize in Chemistry being awarded to **Demis Hassabis**, leader of the AlphaFold project, and **John Jumper**, for groundbreaking contributions to computational biology and protein folding prediction.
 
-We begin with the biological foundations before moving toward the deep learning architectures that enabled this breakthrough. While this post primarily focuses on protein structures, it is important to note that AlphaFold 3 extends beyond isolated proteins and is capable of modeling full biomolecular complexes, including interactions with DNA, RNA, ligands, and ions.
+We begin with the biological foundations before moving towards the deep learning architectures that enabled this breakthrough. While this post primarily focuses on protein structures, it is important to note that AlphaFold 3 extends beyond isolated proteins and is capable of modeling full biomolecular complexes, including interactions with DNA, RNA, ligands, and ions.
 
 ---
 
@@ -45,18 +45,22 @@ Although the amino acid sequence encodes the primary structural information of a
 
 ## Amino Acids — The Building Blocks
 
-Proteins are composed of one or more **chains of amino acids**. Each amino acid is an organic molecule built around a central carbon atom, known as the **C-α atom**, which is bonded to four distinct groups: an amino group (NH₂), a carboxyl group (COOH), a hydrogen atom, and a variable side chain, often referred to as the R-group.
+Proteins are composed of one or more **chains of amino acids**. Each amino acid is an organic molecule built around a central carbon atom, known as the C-α atom, which is bonded to four distinct groups: an amino group (NH₂), a carboxyl group (COOH), a hydrogen atom, and a variable side chain, often referred to as the R-group.
 
 <figure style="text-align: center;">
   <img src="{{ '/assets/images/amino_acid.png' | relative_url }}" alt="Amino Acid Structure" width="500">
-  <figcaption><strong>Figure 1:</strong> General structure of an amino acid showing the central C-α atom, amino group, carboxyl group, hydrogen atom, and variable side chain.</figcaption>
+  <figcaption>
+    <strong>Figure 1:</strong> General structure of an amino acid showing the central C-α atom, amino group, carboxyl group, hydrogen atom, and variable side chain.
+    <br>
+    <em>Source:</em> Adapted from GeeksforGeeks, <em>Amino Acids: Definition, Structure, Properties, Classification</em> [1].
+  </figcaption>
 </figure>
 
 The side chain determines the chemical and physical properties of the amino acid. In nature, there are **20 standard amino acids**, each characterized by a unique side chain and represented by a one-letter code. Once incorporated into a protein chain, an amino acid is referred to as a **residue**.
 
-When amino acids connect, they form **peptide bonds** through a dehydration synthesis reaction. The carboxyl group of one amino acid reacts with the amino group of another, releasing a water molecule and forming a stable covalent linkage.
+When amino acids connect, they form peptide bonds through a dehydration synthesis reaction. The carboxyl group of one amino acid reacts with the amino group of another, releasing a water molecule and forming a stable covalent linkage.
 
-A protein is therefore fundamentally a **linear sequence of residues**, and this sequence encodes the information required for the protein to adopt its final three-dimensional structure.
+A protein is therefore fundamentally a linear sequence of residues, and this sequence encodes the information required for the protein to adopt its final three-dimensional structure.
 
 ---
 
@@ -64,11 +68,15 @@ A protein is therefore fundamentally a **linear sequence of residues**, and this
 
 Proteins do not function as linear chains. Instead, they fold into highly specific three-dimensional structures that determine their biological activity.
 
-Protein structure is commonly described at four hierarchical levels. The **primary structure** corresponds to the amino acid sequence. The **secondary structure** refers to local motifs such as α-helices and β-sheets formed by hydrogen bonding along the backbone. The **tertiary structure** describes the complete three-dimensional conformation of a single polypeptide chain. The **quaternary structure** refers to the arrangement of multiple interacting chains (subunits) into a functional complex.
+Protein structure is commonly described at four hierarchical levels. The primary structure corresponds to the amino acid sequence. The secondary structure refers to local motifs such as α-helices and β-sheets formed by hydrogen bonding along the backbone. The tertiary structure describes the complete three-dimensional conformation of a single polypeptide chain. The quaternary structure refers to the arrangement of multiple interacting chains (subunits) into a functional complex.
 
 <figure style="text-align: center;">
   <img src="{{ '/assets/images/protein_levels.png' | relative_url }}" alt="Protein Structure Levels" width="650">
-  <figcaption><strong>Figure 2:</strong> Hierarchical organization of protein structure — from primary sequence to quaternary assembly.</figcaption>
+  <figcaption>
+    <strong>Figure 2:</strong> Hierarchical organization of protein structure — from primary sequence to quaternary assembly.
+    <br>
+    <em>Source:</em> Biology4Alevel, <em>Protein Structure</em> [2].
+  </figcaption>
 </figure>
 
 Protein folding can be understood as an energy-driven physical process in which a polypeptide chain transitions from a random coil to a thermodynamically stable, low-energy three-dimensional conformation. This transformation is driven by hydrogen bonding, hydrophobic interactions, electrostatic forces, and van der Waals interactions.
@@ -81,16 +89,16 @@ Understanding protein folding is therefore central to medicine, drug discovery, 
 
 ## Why Is Protein Folding Important?
 
-Protein misfolding is linked to numerous diseases. For example, the accumulation of misfolded amyloid proteins plays a central role in **Alzheimer’s disease**, while structural abnormalities in regulatory proteins are associated with various forms of **cancer**. When proteins fail to adopt their correct three-dimensional conformation, they can lose functionality or become toxic to cells.
+Protein misfolding is linked to numerous diseases. For example, the accumulation of misfolded amyloid proteins plays a central role in Alzheimer’s disease, while structural abnormalities in regulatory proteins are associated with various forms of cancer. When proteins fail to adopt their correct three-dimensional conformation, they can lose functionality or become toxic to cells.
 
 Understanding protein folding is therefore central to several major scientific and industrial fields. In **medicine**, structural insight enables the identification of disease mechanisms at the molecular level. In **drug discovery**, knowledge of a protein’s three-dimensional structure allows researchers to design molecules that precisely bind to active or regulatory sites. In **biotechnology**, engineered proteins with specific structural properties can be developed for industrial enzymes, synthetic biology applications, or targeted therapies.
 
 Improved insight into folding mechanisms directly supports the development of new pharmaceuticals. By understanding how proteins fold and interact, researchers can predict binding interfaces, stabilize unstable proteins, and design inhibitors that block harmful interactions.
 
-Moreover, protein structures help interpret **genetic variation and mutations**. Many mutations do not simply change a sequence — they alter structural stability or binding behavior. Structure prediction therefore helps explain why certain mutations are pathogenic while others are benign.
+Moreover, protein structures help interpret genetic variation and mutations. Many mutations do not simply change a sequence, they alter structural stability or binding behavior. Structure prediction therefore helps explain why certain mutations are pathogenic while others are benign.
 
 <figure style="text-align: center;">
-  <img src="{{ '/assets/images/AF-Q8W3K0-F1.png' | relative_url }}" alt="Predicted protein structure example" width="500">
+  <img src="{{ '/assets/images/Corona.JPG' | relative_url }}" alt="Predicted protein structure example" width="500">
   <figcaption><strong>Figure 3:</strong> Example of a predicted protein structure (Q8W3K0 — plant disease resistance protein) from the AlphaFold Protein Structure Database.</figcaption>
 </figure>
 
@@ -111,7 +119,7 @@ $$
 
 If a protein were to explore all these conformations randomly, reaching its native structure would take longer than the age of the universe. Yet, in reality, many proteins fold within milliseconds to seconds.
 
-This apparent contradiction is known as **Levinthal’s Paradox**. It demonstrates that protein folding is not a random search through conformational space, but a highly constrained and guided physical process. Understanding this efficiency has been one of the central challenges of molecular biology — and it is precisely this challenge that makes AlphaFold transformative.
+This apparent contradiction is known as **Levinthal’s Paradox**. It demonstrates that protein folding is not a random search through conformational space, but a highly constrained and guided physical process. Understanding this efficiency has been one of the central challenges of molecular biology and it is precisely this challenge that makes AlphaFold transformative.
 
 ---
 
@@ -121,15 +129,20 @@ The effort to determine protein structures dates back to the 1950s and marks the
 
 Two major approaches have been developed to determine protein structures: experimental methods and computational methods.
 
-Experimental techniques such as **X-ray crystallography** expose crystallized proteins to X-rays and reconstruct electron density maps from diffraction patterns. This method is highly accurate but captures only the final folded structure and requires substantial laboratory effort. **Nuclear magnetic resonance (NMR)** spectroscopy measures protein structures in solution and can capture dynamics on very small time scales, important because folding can occur on the order of 50–3000 s⁻¹.
+Experimental techniques such as **X-ray crystallography** expose crystallized proteins to X-rays and reconstruct electron density maps from diffraction patterns. A typical X-ray pipeline involves protein crystallization — a particularly challenging step for membrane proteins due to their low solubility — followed by X-ray diffraction and reconstruction of electron density maps. One of the central technical challenges in this process is the *phase problem*, which requires specialized methods to resolve. Even after obtaining an electron density map, reconstructing the final 3D atomic model involves a degree of interpretation; especially at lower resolutions, two experts may produce slightly different structural models from the same data. While highly accurate, this method captures only the final folded structure, requires substantial laboratory effort, and is expensive — often costing on the order of \$100,000–\$1,000,000 per structure [3].
 
-Computational approaches aim to predict protein structure directly from the amino acid sequence. These methods incorporate evolutionary information, structural priors, physicochemical constraints, and increasingly, machine learning models trained on large structural databases.
+
+**Nuclear magnetic resonance (NMR)** spectroscopy measures protein structures in solution and can capture dynamics on very small time scales, which is important because folding and conformational transitions can occur on the order of 50–3000 s⁻¹. However, NMR is generally limited to smaller proteins and can be experimentally demanding.
+
+In contrast, reading protein sequences is comparatively inexpensive. Amino acid sequences can be obtained directly via mass spectrometry (roughly \$100 per sample) or indirectly through genome or exome sequencing (approximately \$100–\$1000 per sequence). This creates a significant asymmetry in biology: sequence data is abundant and cheap, whereas experimentally determined structures are scarce and costly.
+
+Computational approaches aim to predict protein structure directly from the amino acid sequence. These methods incorporate evolutionary information, structural priors, physicochemical constraints, and increasingly, machine learning models trained on large structural databases. The growing gap between inexpensive sequence acquisition and expensive structural determination is precisely the bottleneck that modern computational approaches, such as AlphaFold, attempt to overcome.
 
 ---
 
 ## Quality Assessment
 
-Protein structures are typically represented either as a **point cloud** of atomic coordinates or as a **three-dimensional density volume**. A common evaluation metric is the **Root Mean Square Error (RMSE)** over predicted and ground-truth C-α atom positions:
+Protein structures are typically represented either as a point cloud of atomic coordinates or as a three-dimensional density volume. A common evaluation metric is the **Root Mean Square Error (RMSE)** over predicted and ground-truth C-α atom positions:
 
 $$
 L(p_1, p_2) = \sum_{i=1}^{n_C} \| p_1^{(i)} - p_2^{(i)} \|^2
@@ -152,14 +165,20 @@ In 2020 and 2022, AlphaFold dramatically outperformed previous approaches in CAS
 
 AlphaFold 2 fundamentally redefined protein structure prediction by combining evolutionary biology, geometric deep learning, and transformer-based architectures into a single end-to-end differentiable system.
 
-Rather than predicting structures directly from physics-based simulation, AlphaFold 2 learns a representation of residue–residue relationships and then converts this relational structure into three-dimensional geometry through an equivariant structure module.
+At its core lies a crucial biological insight: **evolution contains structural information**.
+
+Many mutations are tolerated without disrupting overall fold, allowing sequence divergence while preserving structural constraints. As a result, protein sequences can diverge substantially across distant species (often by more than 70%), while their three-dimensional structures remain remarkably conserved [3]. In other words:
+
+> Protein structure is far more conserved than protein sequence.
+
+This observation is central. If structure changes slowly while sequences mutate, then comparing homologous sequences across species allows us to infer structural constraints indirectly.
+
+Rather than predicting structure directly from physics-based simulation, AlphaFold 2 learns a representation of residue–residue relationships extracted from evolutionary variation and then converts this relational structure into three-dimensional geometry through an equivariant structure module.
 
 Conceptually, the system operates in two major stages:
 
 1. **Relational reasoning in representation space (Evoformer)**
 2. **Geometric realization in 3D space (Structure Module)**
-
-
 
 <figure style="text-align: center;">
   <img src="{{ '/assets/images/Fold2_Archi.PNG' | relative_url }}" width="750">
@@ -170,7 +189,7 @@ Conceptually, the system operates in two major stages:
 
 ## Input Feature Extraction
 
-The input to AlphaFold 2 is a single amino acid sequence of length \( N \). From this sequence, the model constructs two primary feature tensors:
+The input to AlphaFold 2 is a single amino acid sequence of length $N$. From this sequence, the model constructs two primary feature tensors:
 
 - A **Multiple Sequence Alignment (MSA)** representation  
 - A **Pair representation**
@@ -181,7 +200,21 @@ These two representations form the foundation of the entire architecture.
 
 ### Multiple Sequence Alignment (MSA)
 
-AlphaFold searches large sequence databases to find homologous proteins and builds a Multiple Sequence Alignment. The alignment is embedded into a tensor:
+Starting from the target sequence, AlphaFold performs a large-scale database search to retrieve homologous sequences from diverse species. These sequences are arranged in a two-dimensional table called a **Multiple Sequence Alignment (MSA)**, where:
+
+- Each row corresponds to a homologous protein sequence  
+- Each column corresponds to a specific residue position  
+
+By aligning homologues in this way, corresponding residues across species are placed in the same column.
+
+This alignment encodes powerful evolutionary signals:
+
+- **Conservation** of a column often implies structural or functional importance (e.g., catalytic residues, ligand binding sites).
+- **Co-evolution** between two columns suggests structural coupling — if residue $i$ mutates and residue $j$ consistently mutates in response, the two residues are likely interacting in 3D space.
+
+Intuitively, if two residues participate in a bonding mechanism, mutating one without compensating changes would destabilize the protein. Therefore, correlated mutations preserve structural integrity [4].
+
+The alignment is embedded into a tensor:
 
 $$
 \mathrm{MSA} \in \mathbb{R}^{N_{\text{seq}} \times N \times c_m}
@@ -189,30 +222,32 @@ $$
 
 where:
 
-- \( N_{\text{seq}} \) is the number of aligned sequences  
-- \( N \) is the number of residues  
-- \( c_m \) is the embedding dimension  
+- $N_{\text{seq}}$ is the number of aligned sequences  
+- $N$ is the number of residues  
+- $c_m$ is the embedding dimension  
 
-The MSA captures **evolutionary constraints**. If mutations at position \( i \) correlate with mutations at position \( j \), this co-evolution signal suggests structural coupling between residues.
+This tensor does not explicitly encode distances. Instead, it encodes **evolutionary constraints**, from which geometric structure can be inferred.
 
-Evolution therefore provides indirect supervision for 3D structure.
+Evolution therefore acts as indirect supervision for 3D structure prediction.
 
 <figure style="text-align: center;">
   <img src="{{ '/assets/images/MSA.PNG' | relative_url }}" width="650">
-  <figcaption><strong>Figure 2:</strong> Multiple Sequence Alignment capturing evolutionary variation.</figcaption>
+  <figcaption><strong>Figure 2:</strong> Multiple Sequence Alignment capturing evolutionary conservation and co-evolution signals.</figcaption>
 </figure>
 
 ---
 
 ### Pair Representation
 
-Protein structure is fundamentally about relationships between residues. AlphaFold therefore maintains an explicit pair representation:
+While the MSA captures evolutionary variation, protein structure itself is fundamentally about **relationships between residues**.
+
+To explicitly reason about residue–residue interactions, AlphaFold maintains a second tensor:
 
 $$
 \mathrm{Pair} \in \mathbb{R}^{N \times N \times c_z}
 $$
 
-Each element \( \mathrm{Pair}[i,j] \) is a learned feature vector encoding the model’s belief about how residues \( i \) and \( j \) relate geometrically.
+Each element $\mathrm{Pair}[i,j]$ is a learned feature vector encoding the model’s current belief about how residues $i$ and $j$ relate geometrically.
 
 This tensor can be interpreted as a **complete graph over residues**, where:
 
@@ -220,6 +255,14 @@ This tensor can be interpreted as a **complete graph over residues**, where:
 - Edges store relational features  
 
 Unlike classical contact maps, this representation does not explicitly store distances. Instead, it stores a high-dimensional latent encoding capable of supporting geometric reasoning.
+
+Together, the MSA tensor and the Pair tensor provide two complementary perspectives:
+
+- The MSA captures evolutionary constraints across species.
+- The Pair representation captures geometric relationships within a single protein.
+
+The Evoformer iteratively refines both representations, allowing evolutionary signals to shape geometric reasoning before any 3D coordinates are predicted.
+
 
 ---
 
@@ -705,3 +748,20 @@ AlphaFold 3 is:
 - Unified interaction modeling  
 
 If AlphaFold 2 acts as a geometric constraint solver, AlphaFold 3 behaves as a learned molecular simulator guided by relational context.
+
+
+---
+
+## References
+
+[1] GeeksforGeeks, *Amino Acids: Definition, Structure, Properties, Classification*.  
+https://www.geeksforgeeks.org/amino-acids-definition-structure-properties-classification/
+
+[2] Biology4Alevel, *Protein Structure*.  
+http://biology4alevel.blogspot.com/2014/
+
+[3] Boris Burkov, *Why AlphaFold 2 Matters*.  
+https://borisburkov.net/2021-12-25-1/
+
+[4] Simon Kohl, *Highly Accurate Protein Structure Prediction with AlphaFold*, Heidelberg.ai, May 05 2022.  
+https://heidelberg.ai/2022/05/05/alpha-fold.html :contentReference[oaicite:1]{index=1}
