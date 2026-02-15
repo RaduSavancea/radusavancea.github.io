@@ -398,7 +398,7 @@ The Structure Module is designed to be **SE(3)-equivariant**, meaning:
 
 <figure style="text-align: center;">
   <img src="{{ '/assets/images/Structure_Module.PNG' | relative_url }}" width="650">
-  <figcaption><strong>Figure 4:</strong> Structure module translating relational embeddings into 3D frames.</figcaption>
+  <figcaption><strong>Figure 7:</strong> Structure module translating relational embeddings into 3D frames (Jumper et al., 2021) <sup><a href="#ref5">[5]</a></sup>.</figcaption>
 </figure>
 
 
@@ -540,8 +540,7 @@ This separation between high-dimensional relational reasoning and geometric inst
 
 # AlphaFold 3 
 
-AlphaFold 3 represents a fundamental architectural shift compared to AlphaFold 2.  
-While AlphaFold 2 solved protein folding through deterministic equivariant refinement of residue frames, AlphaFold 3 generalizes structure prediction into a unified, generative model of full biomolecular systems.
+AlphaFold 3 represents a substantial architectural evolution of the AlphaFold framework. While many core principles from AlphaFold 2 remain unchanged: relational reasoning, pairwise representations, deep iterative refinement; the mechanism used to generate structure changes fundamentally.
 
 Instead of predicting a single rigidly refined protein structure, AlphaFold 3 models:
 
@@ -551,11 +550,27 @@ Instead of predicting a single rigidly refined protein structure, AlphaFold 3 mo
 - Metal ions  
 - Covalent modifications  
 
-within one shared architecture. Folding and binding are no longer separate tasks — structure and interaction are predicted jointly.
+within one shared architecture. Folding and binding are no longer separate problems. Structure and interaction are predicted simultaneously within a unified architecture.
 
 This transition required a conceptual change: from geometric constraint solving to probabilistic generative modeling.
 
 ---
+
+
+## Architectural Continuity and Change
+
+Despite the generative shift, the high-level structure resembles AlphaFold 2:
+
+1. A large relational trunk builds abstract representations  
+2. A structure module converts those representations into 3D coordinates  
+
+However, both components have evolved.
+
+- The Evoformer trunk is replaced by the Pairformer
+- The SE(3)-equivariant Structure Module is replaced by a Diffusion Module
+
+The architectural pattern remains similar: relational reasoning first, coordinate generation second. What changes is how geometry is produced.
+
 
 ## A Unified Molecular Representation
 
@@ -575,15 +590,29 @@ The single representation stores per-token features, while the pair representati
 
 Unlike AlphaFold 2, no assumption is made that tokens correspond only to amino acid residues. This unified representation enables modeling heterogeneous complexes directly.
 
+
 ---
 
 ## The Pairformer
 
-The Evoformer trunk of AlphaFold 2 is replaced by the **Pairformer** in AlphaFold 3. They have a similar structure, but some changes were made to make it work for different types of molecular structure.  
 
-The Pairformer jointly updates token embeddings and pair embeddings through attention and message passing.
+The Evoformer in AlphaFold 2 alternated between MSA-based axial attention and triangle updates over residue pairs. While extremely powerful, this design was tightly coupled to explicit multiple sequence alignment (MSA) processing.
 
-Attention between tokens \( i \) and \( j \) is computed as:
+The Pairformer in AlphaFold 3 simplifies and generalizes this architecture.
+
+<figure style="text-align: center;">
+  <img src="{{ '/assets/images/AF3.PNG' | relative_url }}" width="750">
+  <figcaption><strong>Figure 1:</strong> Overall AlphaFold 3 architecture.</figcaption>
+</figure>
+
+Key differences include:
+
+- The explicit stacked MSA representation of AlphaFold 2 is removed, with evolutionary information distilled into a unified single representation  
+- A single representation replaces the alternating MSA stack  
+- No outer-product mean updates  
+- More streamlined communication between single and pair representations  
+
+Attention between tokens *i* and *j* is computed as:
 
 $$
 \mathrm{score}(i,j)
@@ -593,52 +622,23 @@ Q_i \cdot K_j
 b_{ij}
 $$
 
-where
+where the bias term is derived from the pair representation and injected directly into the attention mechanism. This allows relational information to modulate attention weights without explicitly alternating between separate MSA and pair stacks.
 
-$$
-Q_i = W_Q s_i,
-\qquad
-K_j = W_K s_j
-$$
+Pair embeddings are updated in parallel through learned transformations and multiplicative interactions, preserving the idea that protein structure prediction is fundamentally about residue–residue relationships.
 
-and the pair bias is derived from the pair representation:
+Conceptually, the Pairformer acts as a lighter and more general relational trunk. Whereas the Evoformer was tightly specialized for protein MSAs, the Pairformer is designed to operate across heterogeneous molecular systems, including proteins, nucleic acids, ligands, and ions.
 
-$$
-b_{ij} = W_b z_{ij}
-$$
-
-This formulation integrates relational reasoning directly into attention.
-
-Pair embeddings are updated alongside token embeddings using learned transformations such as:
-
-$$
-z_{ij}
-\leftarrow
-\mathrm{MLP}(z_{ij}, s_i, s_j)
-$$
-
-Unlike AlphaFold 2, there are no explicit triangle attention modules.  
-Relational consistency is instead learned implicitly through the diffusion objective.
 
 ---
 
 ## Diffusion-Based Structure Generation
 
-The most significant architectural innovation of AlphaFold 3 is the introduction of diffusion modeling for structure generation.
+The most significant innovation in AlphaFold 3 is the replacement of rigid-body refinement with diffusion modeling.
 
-Rather than refining rigid-body frames like in the Structure module of AF2, the model directly generates atomic coordinates.
+AlphaFold 2 predicted backbone frames and torsion angles deterministically.  
+AlphaFold 3 instead generates full atomic coordinates through iterative denoising.
 
----
-
-### Forward Diffusion Process (Training)
-
-During training, clean coordinates
-
-$$
-x_0 \in \mathbb{R}^{3N}
-$$
-
-are progressively corrupted with Gaussian noise:
+During training, clean coordinates are progressively corrupted with Gaussian noise:
 
 $$
 x_t
@@ -648,161 +648,51 @@ x_t
 \sqrt{1 - \alpha_t} \, \epsilon
 $$
 
-where
+The network learns to predict the added noise, conditioned on the relational representations built by the Pairformer.
 
-$$
-\epsilon \sim \mathcal{N}(0, I)
-$$
-
-and \( t \) denotes the diffusion timestep.
-
-As \( t \) increases, the structure becomes increasingly noisy.
-
----
-
-### Noise Prediction Objective
-
-The model learns to predict the added noise:
-
-$$
-\hat{\epsilon}_\theta(x_t, t, \text{context})
-$$
-
-The training objective minimizes:
-
-$$
-\mathcal{L}
-=
-\mathbb{E}_{x_0, \epsilon, t}
-\left[
-\|
-\epsilon
--
-\hat{\epsilon}_\theta(x_t, t)
-\|^2
-\right]
-$$
-
-The context includes:
-
-- Token embeddings from the Pairformer  
-- Pair embeddings  
-- Molecular identity features  
-- Optional template information  
-
----
-
-### Reverse Diffusion (Inference)
-
-At inference time, the process is reversed.
-
-We begin with pure Gaussian noise:
+At inference time, the process is reversed. Starting from pure Gaussian noise:
 
 $$
 x_T \sim \mathcal{N}(0, I)
 $$
 
-Coordinates are iteratively updated via learned denoising steps:
+the model iteratively denoises coordinates until a coherent molecular structure emerges.
 
-$$
-x_{t-1}
-=
-\frac{1}{\sqrt{\alpha_t}}
-\left(
-x_t
--
-\frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}}
-\hat{\epsilon}_\theta(x_t, t)
-\right)
-+
-\sigma_t z
-$$
-
-where
-
-$$
-z \sim \mathcal{N}(0, I)
-$$
-
-After sufficient iterations, the final structure is obtained.
+Most of the computation happens in the conditioning trunk (the Pairformer). The diffusion module then samples structures consistent with the learned relational representation.
 
 ---
 
 ## Conformer Generation and Chemical Priors
 
-Ligands and flexible molecules introduce additional challenges due to internal torsional freedom.
+For ligands and flexible molecules, chemically valid conformers are generated prior to diffusion.
 
-AlphaFold 3 therefore generates chemically valid conformers prior to diffusion. These conformers respect:
+These conformers respect:
 
 - Fixed bond lengths  
 - Bond angles  
 - Allowed torsion states  
 
-They provide plausible internal geometries, but remain flexible during diffusion.
+Diffusion then adjusts global placement and interaction geometry.
 
-This differs from AlphaFold 2, which predicted torsion angles explicitly and relied on rigid residue frames.
+This differs from AlphaFold 2, where torsion angles were predicted explicitly within rigid residue frames. AlphaFold 3 moves closer to full atomic generative modeling.
 
----
-
-## Geometric Consistency and Equivariance
-
-AlphaFold 2 enforced SE(3)-equivariance explicitly through rigid-body frames and invariant point attention.
-
-AlphaFold 3 instead learns geometric consistency statistically.
-
-If coordinates are globally rotated by \( R \), the model learns to satisfy approximately:
-
-$$
-\hat{\epsilon}_\theta(R x_t)
-=
-R \, \hat{\epsilon}_\theta(x_t)
-$$
-
-Equivariance is not hard-coded through rigid-body updates but emerges from training on 3D structures.
-
-Geometric inconsistencies increase diffusion loss, pushing the model toward physically valid configurations.
 
 ---
 
-## Sampling and Structural Ensembles
+## Summary of the Shift
 
-Because diffusion is stochastic, different random initializations:
+AlphaFold 2 produced nearly deterministic predictions for a given input sequence and it can be seen as a geometric solver in SE(3).
 
-$$
-x_T \sim \mathcal{N}(0, I)
-$$
+AlphaFold 3 introduces stochastic sampling and is a generative model over atomic coordinates. Different initial noise realizations can yield different, yet physically plausible, conformations.
 
-produce different valid structures.
+This probabilistic formulation enables:
 
-This enables:
-
-- Sampling alternative conformations  
-- Modeling flexible binding modes  
-- Representing uncertainty  
+- Sampling alternative binding poses  
+- Modeling conformational variability  
+- Representing structural uncertainty  
 - Generating structural ensembles  
 
-Unlike AlphaFold 2, which produces largely deterministic outputs, AlphaFold 3 naturally models structural variability.
-
----
-
-## Conceptual Comparison with AlphaFold 2
-
-AlphaFold 2 can be summarized as:
-
-- Deterministic  
-- Residue-centric  
-- Explicit geometric reasoning  
-- Rigid-body equivariant refinement  
-
-AlphaFold 3 is:
-
-- Generative  
-- Atom-centric and multi-molecular  
-- Diffusion-based  
-- Unified interaction modeling  
-
-If AlphaFold 2 acts as a geometric solver, AlphaFold 3 behaves more like a learned molecular simulator guided by relational context.
-
+The treatment of equivariance also evolves. In AlphaFold 2, SE(3)-equivariance was enforced explicitly through specialized architectural components such as IPA. In AlphaFold 3, rigid-body equivariance is encouraged statistically through a combination of equivariant conditioning and random rotation–translation data augmentation applied during training. Rather than hard-coding symmetry into attention updates, the model learns to respect geometric symmetries within the diffusion framework.
 
 # Experiments and Results
 
@@ -813,9 +703,9 @@ Although AlphaFold represents a major breakthrough in structure prediction, impo
 
 One issue observed in the AlphaFold 3 paper is the appearance of structured predictions in regions that are experimentally known to be intrinsically disordered. These regions do not adopt a single stable conformation in reality, yet the model may generate ordered structures for them. This behavior is often referred to as "hallucination". In most cases, the predicted confidence for these regions is low, indicating uncertainty. However, the model may still output geometrically coherent shapes that do not reflect true biological disorder. This illustrates a broader challenge in generative modeling: the system must not only generate plausible structures, but also correctly represent uncertainty and flexibility.
 
-Another limitation concerns conformational diversity. Proteins are dynamic systems that exist as ensembles of conformations rather than single fixed structures. Many biological processes depend on structural transitions, such as conformational switching, induced-fit binding, and transient interactions. Current AlphaFold models primarily predict one dominant conformation or a limited set of sampled structures. They do not yet capture the full thermodynamic landscape of accessible states.
+Another limitation concerns conformational diversity. Proteins are dynamic systems that exist as ensembles of conformations rather than single fixed structures. Many biological processes depend on structural transitions, such as conformational switching, induced-fit binding, and interactions. Current AlphaFold models primarily predict one dominant conformation or a limited set of sampled structures. They do not yet capture the full thermodynamic landscape of accessible states.
 
-A related challenge arises when moving from structure prediction to molecular design. A protein or complex generated computationally may appear stable and chemically reasonable in static three-dimensional space. However, its behavior inside a living organism might be different and depends on many additional factors: folding kinetics, degradation pathways, interactions with other biomolecules, post-translational modifications, immune recognition, and cellular environment. These aspects are not directly modeled by current structure prediction systems.
+A related challenge arises when moving from structure prediction to molecular design. A protein or complex generated computationally may appear stable and chemically reasonable in static three-dimensional space. However, its behavior inside a living organism might be different and depends on many additional factors. These aspects are not directly modeled by current structure prediction systems.
 
 Biological systems operate in dynamic, crowded, and context-dependent environments. Accurately modeling how proteins behave under physiological conditions requires integrating structural prediction with thermodynamics, kinetics, and systems-level biology. While AlphaFold has significantly advanced static structure prediction, understanding and modeling dynamic biomolecular behavior remains an open area of research.
 
