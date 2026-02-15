@@ -189,13 +189,7 @@ Conceptually, the system operates in two major stages:
 
 ## Input Feature Extraction
 
-The input to AlphaFold 2 is a single amino acid sequence of length
-
-$$
-N
-$$
-
-From this sequence, the model constructs two primary feature tensors:
+The input to AlphaFold 2 is a single amino acid sequence of length $N$. From this sequence, the model constructs two primary feature tensors:
 
 - A **Multiple Sequence Alignment (MSA)** representation  
 - A **Pair representation**
@@ -213,23 +207,10 @@ Starting from the target sequence, AlphaFold performs a large-scale database sea
 
 By aligning homologues in this way, corresponding residues across species are placed in the same column.
 
-This alignment encodes powerful evolutionary signals.
+This alignment encodes powerful evolutionary signals:
 
-**Conservation** of a column often implies structural or functional importance (for example catalytic residues or ligand binding sites).
-
-**Co-evolution** between two columns suggests structural coupling. If residue
-
-$$
-i
-$$
-
-mutates and residue
-
-$$
-j
-$$
-
-consistently mutates in response, the two residues are likely interacting in three-dimensional space.
+- **Conservation** of a column often implies structural or functional importance (e.g., catalytic residues, ligand binding sites).
+- **Co-evolution** between two columns suggests structural coupling — if residue $i$ mutates and residue $j$ consistently mutates in response, the two residues are likely interacting in 3D space.
 
 Intuitively, if two residues participate in a bonding mechanism, mutating one without compensating changes would destabilize the protein. Therefore, correlated mutations preserve structural integrity <sup><a href="#ref4">[4]</a></sup>.
 
@@ -239,29 +220,26 @@ $$
 \mathrm{MSA} \in \mathbb{R}^{N_{\text{seq}} \times N \times c_m}
 $$
 
+where:
+
 where
 
 $$
-N_{\text{seq}}
+N_{\text{seq}} \text{ is the number of aligned sequences,}
 $$
 
-is the number of aligned sequences,
-
 $$
-N
+N \text{ is the number of residues,}
 $$
 
-is the number of residues, and
-
 $$
-c_m
+c_m \text{ is the embedding dimension.}
 $$
 
-is the embedding dimension.
 
 This tensor does not explicitly encode distances. Instead, it encodes **evolutionary constraints**, from which geometric structure can be inferred.
 
-Evolution therefore provides statistical constraints that indirectly encode three-dimensional structure.
+Evolution therefore acts as indirect supervision for 3D structure prediction.
 
 <figure style="text-align: center;">
   <img src="{{ '/assets/images/MSA.PNG' | relative_url }}" width="650">
@@ -272,7 +250,7 @@ Evolution therefore provides statistical constraints that indirectly encode thre
 
 ### Pair Representation
 
-While the MSA captures evolutionary variation across species, protein structure itself is fundamentally about **relationships between residues**.
+While the MSA captures evolutionary variation, protein structure itself is fundamentally about **relationships between residues**.
 
 To explicitly reason about residue–residue interactions, AlphaFold maintains a second tensor:
 
@@ -280,37 +258,21 @@ $$
 \mathrm{Pair} \in \mathbb{R}^{N \times N \times c_z}
 $$
 
-Each element
+Each element $\mathrm{Pair}[i,j]$ is a learned feature vector encoding the model’s current belief about how residues $i$ and $j$ relate geometrically.
 
-$$
-\mathrm{Pair}[i,j]
-$$
+This tensor can be interpreted as a **complete graph over residues**, where:
 
-is a learned feature vector encoding the model’s current belief about how residues
+- Nodes correspond to residues  
+- Edges store relational features  
 
-$$
-i
-$$
-
-and
-
-$$
-j
-$$
-
-relate geometrically.
-
-This tensor can be interpreted as a complete graph over residues, where nodes correspond to residues and edges store relational features.
-
-Unlike classical contact maps, this representation does not explicitly store distances. Instead, it stores a high-dimensional latent encoding capable of supporting geometric reasoning after iterative refinement.
+Unlike classical contact maps, this representation does not explicitly store distances. Instead, it stores a high-dimensional latent encoding capable of supporting geometric reasoning.
 
 Together, the MSA tensor and the Pair tensor provide two complementary perspectives:
 
 - The MSA captures evolutionary constraints across species.
 - The Pair representation captures geometric relationships within a single protein.
 
-The Evoformer iteratively refines both representations, allowing evolutionary signals to shape geometric reasoning before any three-dimensional coordinates are predicted.
-
+The Evoformer iteratively refines both representations, allowing evolutionary signals to shape geometric reasoning before any 3D coordinates are predicted.
 
 
 ---
@@ -801,36 +763,34 @@ If AlphaFold 2 acts as a geometric constraint solver, AlphaFold 3 behaves as a l
 
 ---
 
-## References
+
 
 ## References
 
 <div id="ref1">
 
-**[1]** GeeksforGeeks. (n.d.). *Amino Acids: Definition, Structure, Properties, Classification*.  
-<a href="https://www.geeksforgeeks.org/amino-acids-definition-structure-properties-classification/" target="_blank">
+[1] GeeksforGeeks. (n.d.). <em>Amino Acids: Definition, Structure, Properties, Classification</em>. Retrieved from  
 https://www.geeksforgeeks.org/amino-acids-definition-structure-properties-classification/
-</a>
 
 </div>
 
 <div id="ref2">
 
-**[2]** Biology4Alevel. (2014). *Protein Structure*.  
-<a href="http://biology4alevel.blogspot.com/2014/" target="_blank">
+[2] Biology4Alevel. (2014). <em>Protein Structure</em>. Retrieved from  
 http://biology4alevel.blogspot.com/2014/
-</a>
 
 </div>
 
 <div id="ref3">
 
-**[3]** Burkov, B. (2021). *Why AlphaFold 2 Matters*.  
+[3] Burkov, B. (2021). <em>Why AlphaFold 2 Matters</em>. Retrieved from  
 https://borisburkov.net/2021-12-25-1/
 
 </div>
 
 <div id="ref4">
 
-**[4]** Kohl, S. (2022). *Highly Accurate Protein Structure Prediction with AlphaFold*. Heidelberg.ai.  
+[4] Kohl, S. (2022). <em>Highly Accurate Protein Structure Prediction with AlphaFold</em>. Heidelberg.ai. Retrieved from  
 https://heidelberg.ai/2022/05/05/alpha-fold.html
+
+</div>
