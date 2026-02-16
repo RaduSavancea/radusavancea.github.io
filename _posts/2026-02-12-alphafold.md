@@ -27,7 +27,7 @@ We begin with the biological foundations before moving towards the deep learning
 4. [AlphaFold 2](#alphafold-2)  
 5. [AlphaFold 3](#alphafold-3)  
 6. [Experiments and Results](#experiments-and-results)  
-7. [Concluding Thoughts and Limitations](#concluding-thoughts)    
+7. [Concluding Thoughts and Limitations](#concluding-thoughts)   
 
 ---
 
@@ -99,7 +99,7 @@ Moreover, protein structures help interpret genetic variation and mutations. Man
 
 <figure style="text-align: center;">
   <img src="{{ '/assets/images/Corona.JPG' | relative_url }}" alt="Predicted protein structure example" width="450">
-  <figcaption><strong>Figure 3:</strong>  Human coronavirus OC43 spike protein (4,665 residues), heavily glycosylated and bound by neutralizing antibodies <sup><a href="#ref7">[7]</a></sup>.</figcaption>
+  <figcaption><strong>Figure 3:</strong>  Human coronavirus OC43 spike protein, heavily glycosylated and bound by neutralizing antibodies <sup><a href="#ref7">[7]</a></sup>.</figcaption>
 </figure>
 
 The ability to computationally predict accurate protein structures at scale fundamentally changes how we approach biology, medicine, and molecular engineering.
@@ -144,7 +144,15 @@ Computational approaches aim to predict protein structure directly from the amin
 Protein structures are typically represented either as a point cloud of atomic coordinates or as a three-dimensional density volume. A common evaluation metric is the **Root Mean Square Error (RMSE)** over predicted and ground-truth C-α atom positions:
 
 $$
-L(p_1, p_2) = \sum_{i=1}^{n_C} \| p_1^{(i)} - p_2^{(i)} \|^2
+\mathrm{RMSE}(p_1, p_2)
+=
+\sqrt{
+\frac{1}{n_C}
+\sum_{i=1}^{n_C}
+\left\|
+p_1^{(i)} - p_2^{(i)}
+\right\|^2
+}
 $$
 
 However, because protein structures have no canonical orientation, RMSE is only meaningful after spatial alignment.
@@ -153,7 +161,7 @@ To enable fair comparison between prediction methods, the community established 
 
 Additional metrics such as **lDDT (local Distance Difference Test)** and **DockQ** are used to assess local structural accuracy and the quality of predicted molecular interfaces.
 
-In 2020 and 2022, AlphaFold dramatically outperformed previous approaches in CASP, nearly doubling the GDT accuracy of earlier systems. This marked a turning point in computational biology and set the stage for the deep learning revolution in protein structure prediction.
+In 2020 and 2022, AlphaFold dramatically outperformed previous approaches in CASP, surpassing the GDT accuracy of previous systems by a large margin. This marked a turning point in computational biology and set the stage for the deep learning revolution in protein structure prediction.
 
 ---
 
@@ -741,7 +749,7 @@ On the recent PDB low-homology subset, AlphaFold 3 consistently outperforms Alph
   <img src="{{ '/assets/images/ProteinProtein.JPG' | relative_url }}"
        style="width: 60%; display: block; margin: 0 auto;">
   <figcaption style="text-align: center;">
-    <strong>Figure 8:</strong> AlphaFold 3 improvements for protein–protein interactions (Abramson et al., 2024) <sup><a href="#ref7">[7]</a></sup>.
+    <strong>Figure 9:</strong> AlphaFold 3 improvements for protein–protein interactions (Abramson et al., 2024) <sup><a href="#ref7">[7]</a></sup>.
   </figcaption>
 </figure>
 
@@ -754,7 +762,7 @@ Another striking advance mentioned in the results section of the AlphaFold 3 pap
 <figure style="text-align: center;">
   <img src="{{ '/assets/images/ProteinLing.JPG' | relative_url }}" width="750">
   <figcaption>
-    <strong>Figure 9:</strong> AlphaFold 3 improvements for protein–ligand prediction evaluated on PoseBusters and recent PDB datasets (Abramson et al., 2024) <sup><a href="#ref7">[7]</a></sup>.
+    <strong>Figure 10:</strong> AlphaFold 3 improvements for protein–ligand prediction evaluated on PoseBusters and recent PDB datasets (Abramson et al., 2024) <sup><a href="#ref7">[7]</a></sup>.
   </figcaption>
 </figure>
 
