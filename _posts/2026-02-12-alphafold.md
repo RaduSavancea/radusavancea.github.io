@@ -602,7 +602,7 @@ The Pairformer in AlphaFold 3 simplifies and generalizes this architecture.
 
 <figure style="text-align: center;">
   <img src="{{ '/assets/images/AF3.PNG' | relative_url }}" width="750">
-  <figcaption><strong>Figure 1:</strong> Overall AlphaFold 3 architecture.</figcaption>
+  <figcaption><strong>Figure 8:</strong> Overall AlphaFold 3 architecture.</figcaption>
 </figure>
 
 Key differences include:

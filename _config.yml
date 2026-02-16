@@ -13,7 +13,7 @@ author:
   name: "Radu-Mihai Savancea"
   bio: "Exploring scientific deep learning, mathematical data science, and a world with more bits than atoms."
   location: "Stuttgart"
-  avatar: "/assets/images/profile.png"
+  #avatar: "/assets/images/profile.png"
 
   links:
     - label: "GitHub"
