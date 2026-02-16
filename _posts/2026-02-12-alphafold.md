@@ -48,7 +48,7 @@ Although the amino acid sequence encodes the primary structural information of a
 Proteins are composed of one or more chains of amino acids. Each amino acid is an organic molecule built around a central carbon atom, known as the C-α atom, which is bonded to four distinct groups: an amino group (NH₂), a carboxyl group (COOH), a hydrogen atom, and a variable side chain, often referred to as the R-group.
 
 <figure style="text-align: center;">
-  <img src="{{ '/assets/images/amino_acid.png' | relative_url }}" alt="Amino Acid Structure" width="500">
+  <img src="{{ '/assets/images/amino_acid.png' | relative_url }}" alt="Amino Acid Structure" width="450">
   <figcaption>
     <strong>Figure 1:</strong> General structure of an amino acid showing the central C-α atom, amino group, carboxyl group, hydrogen atom, and variable side chain.
     <br>
@@ -71,7 +71,7 @@ Proteins do not function as linear chains. Instead, they fold into highly specif
 Protein structure is commonly described at four hierarchical levels. The primary structure corresponds to the amino acid sequence. The secondary structure refers to local motifs such as α-helices and β-sheets formed by hydrogen bonding along the backbone. The tertiary structure describes the complete three-dimensional conformation of a single polypeptide chain. The quaternary structure refers to the arrangement of multiple interacting chains (subunits) into a functional complex.
 
 <figure style="text-align: center;">
-  <img src="{{ '/assets/images/protein_levels.png' | relative_url }}" alt="Protein Structure Levels" width="650">
+  <img src="{{ '/assets/images/protein_levels.png' | relative_url }}" alt="Protein Structure Levels" width="600">
   <figcaption>
     <strong>Figure 2:</strong> Hierarchical organization of protein structure — from primary sequence to quaternary assembly.
     <br>
@@ -98,7 +98,7 @@ Improved insight into folding mechanisms directly supports the development of ne
 Moreover, protein structures help interpret genetic variation and mutations. Many mutations do not simply change a sequence, they alter structural stability or binding behavior. Structure prediction therefore helps explain why certain mutations are pathogenic while others are benign.
 
 <figure style="text-align: center;">
-  <img src="{{ '/assets/images/Corona.JPG' | relative_url }}" alt="Predicted protein structure example" width="500">
+  <img src="{{ '/assets/images/Corona.JPG' | relative_url }}" alt="Predicted protein structure example" width="450">
   <figcaption><strong>Figure 3:</strong>  Human coronavirus OC43 spike protein (4,665 residues), heavily glycosylated and bound by neutralizing antibodies.</figcaption>
 </figure>
 
@@ -214,7 +214,7 @@ This alignment encodes powerful evolutionary signals:
 
 Intuitively, if two residues participate in a bonding mechanism, mutating one without compensating changes would destabilize the protein. Therefore, correlated mutations preserve structural integrity <sup><a href="#ref4">[4]</a></sup>.
 
-The matrix allignments are embedded into a 3D tensor:
+The matrix alignments are embedded into a 3D tensor:
 
 $$
 \begin{aligned}
@@ -230,7 +230,7 @@ This tensor does not explicitly encode distances. Instead, it encodes **evolutio
 Evolution therefore acts as indirect supervision for the 3D structure prediction.
 
 <figure style="text-align: center;">
-  <img src="{{ '/assets/images/Coevolution.JPG' | relative_url }}" width="650">
+  <img src="{{ '/assets/images/Coevolution.JPG' | relative_url }}" width="550">
   <figcaption><strong>Figure 5:</strong> Multiple Sequence Alignment capturing evolutionary conservation and co-evolution signals.</figcaption>
 </figure>
 
@@ -313,15 +313,15 @@ $$
 
 is selected, and self-attention is applied along the sequence axis.
 
-This mechanism captures evolutionary variation at a specific residue position. Signals such as conservation, mutation patterns and co-evolutionary are extracted.
+This mechanism captures evolutionary variation at a specific residue position. Signals such as conservation, mutation patterns and co-evolution are extracted.
 
-Column-wise attention therefore models how a structural position behaves across evolutionary time. Together, row and column attention allow the Evoformer to extract meaningful information from evolution process.
+Column-wise attention therefore models how a structural position behaves across evolutionary time. Together, row and column attention allow the Evoformer to extract meaningful information from the evolution process.
 
 ---
 
 ## Triangle Updates: Enforcing Geometric Consistency
 
-While axial attention extracts evolutionary patterns, it does not by itself guarantee geometric consistency. This is why the triangular updates try to enforce geomerty into the model.
+While axial attention extracts evolutionary patterns, it does not by itself guarantee geometric consistency. This is why the triangle updates attempt to enforce geometric consistency within the model.
 
 If residue *i* is predicted to be close to residue *k*, and residue *k* is close to residue *j*, then residue *i* cannot be arbitrarily far from residue *j*. In Euclidean space, distances must satisfy the triangle inequality:
 
@@ -369,9 +369,10 @@ A symmetric variant ensures that information flows consistently around both orie
 
 ### Why This Matters
 
-Triangle attention allows local pairwise predictions to become globally coherent and respect the geometry of the Euclidian space. Instead of treating each residue pair independently, the model assures their compatibility with other surrounding residues.
+Triangle attention allows local pairwise predictions to become globally coherent and respect the geometry of the Euclidean
+space. Instead of treating each residue pair independently, the model assures their compatibility with other surrounding residues.
 
-No explicit geometric rule is imposed. Instead, geometry is enforced through the way in which the attention mecanishm is built, encouraging the pair representation to become geometrically consistent.
+No explicit geometric rule is imposed. Instead, geometry is enforced through the way in which the attention mechanism is built, encouraging the pair representation to become geometrically consistent.
 
 The combination of axial attention, which extracts evolutionary patterns, and triangle attention, which enforces geometric structure, makes the learned feature representation rich and lays the foundation for the structure module.
 
@@ -383,7 +384,7 @@ After the Evoformer produces a consistent relational representation, AlphaFold t
 
 The Structure Module performs this transition. It treats the protein not as a continuous chain at first, but as a collection of independent rigid units, also denoted in the paper as a **residue gas**.
 
-Each amino acid is modeled as a rigid triangle defined by its backbone atoms (N, Cα, C). Importantly, these residues are initially *disconnected* and placed at the origin (idea of cutting the peptide chain). The polymer chain constraint is temporarily ignored. The network must therefore learn how to assemble this unordered collection of rigid residues into a coherent three-dimensional structure
+Each amino acid is modeled as a rigid triangle defined by its backbone atoms (N, Cα, C). Importantly, these residues are initially *disconnected* and placed at the origin (idea of cutting the peptide chain). The polymer chain constraint is temporarily ignored. The network must therefore learn how to assemble this unordered collection of rigid residues into a coherent three-dimensional structure.
 
 The Structure Module is designed to be **SE(3)-equivariant**, meaning:
 
@@ -419,7 +420,7 @@ $$
 R_i = I, \quad t_i = 0
 $$
 
-All residues therefore begin as overlapping triangles at the origin, also known as the "gas" configuration, or "Black hole initialization". The task of the structure module is to progressively rotate and translate these rigid units into their correct spatial arrangement
+All residues therefore begin as overlapping triangles at the origin, also known as the "gas" configuration, or "Black hole initialization". The task of the structure module is to progressively rotate and translate these rigid units into their correct spatial arrangement.
 
 ---
 
@@ -523,7 +524,7 @@ Bond lengths and bond angles remain fixed, ensuring chemically valid geometry.
 
 ## Conceptual Summary
 
-AlphaFold 2 separates protein folding into two conceptual phases:
+AlphaFold 2 separates protein folding into three conceptual phases:
 
 1. **Learning relational evolutionary patterns and residue interactions in representation space (Evoformer)**
 2. **Converting relational structure into three-dimensional geometry (Structure Module)**
@@ -534,7 +535,7 @@ This separation between high-dimensional relational reasoning and geometric know
 
 # AlphaFold 3 
 
-AlphaFold 3 represents a substantial architectural step forward of the AlphaFold framework, moving toward more general structure prediction. While many core principles from AlphaFold 2 remain unchanged: relational reasoning, pairwise representations, deep iterative refinement; the mechanism used to generate molecular structure changes fundamentally.
+AlphaFold 3 represents a substantial architectural step forward for the AlphaFold framework, moving toward more general structure prediction. While many core principles from AlphaFold 2 remain unchanged: relational reasoning, pairwise representations, deep iterative refinement; the mechanism used to generate molecular structure changes fundamentally.
 
 Instead of predicting a single rigidly refined protein structure, AlphaFold 3 models:
 
@@ -729,7 +730,7 @@ Additionally, AlphaFold 3 was evaluated on several CASP15 RNA targets (R1116, R1
 On the recent PDB low-homology subset, AlphaFold 3 consistently outperforms AlphaFold-Multimer v2.3. Improvements are observed across general protein–protein interfaces and are particularly pronounced for antibody–antigen complexes.
 
 <figure style="text-align: center;">
-  <img src="{{ '/assets/images/ProteinProtein.JPG' | relative_url }}" width="750">
+  <img src="{{ '/assets/images/ProteinProtein.JPG' | relative_url }}" style="width: 60%;">
   <figcaption>
     <strong>Figure 8:</strong> AlphaFold 3 improvements for protein–protein interactions (Abramson et al., 2024) <sup><a href="#ref7">[7]</a></sup>.
   </figcaption>
