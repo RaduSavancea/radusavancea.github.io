@@ -274,7 +274,7 @@ As the network trunk is progressively refined, evolutionary patterns become embe
 
 <figure style="text-align: center;">
   <img src="{{ '/assets/images/Evo.JPG' | relative_url }}" width="700">
-  <figcaption><strong>Figure 6:</strong> Evoformer architecture showing MSA attention and pair updates <sup><a href="#ref5">[5]</a></sup>.</figcaption>
+  <figcaption><strong>Figure 6:</strong> Evoformer architecture showing MSA attention and pair updates (Jumper et al., 2021) <sup><a href="#ref5">[5]</a></sup>.</figcaption>
 </figure>
 
 ---
