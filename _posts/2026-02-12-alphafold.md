@@ -695,6 +695,10 @@ The treatment of equivariance also evolves. In AlphaFold 2, SE(3)-equivariance w
 Before AlphaFold 3, AlphaFold 2 fundamentally changed the field at CASP14 (2020).  
 The table below shows the progression of leading methods across CASP editions.
 
+<div style="display: flex; justify-content: center;">
+
+<div style="width: 80%;">
+
 | CASP Edition | Year | Top GDT_TS | Leading Method                         |
 |--------------|------|------------|----------------------------------------|
 | CASP5        | 2002 | 40         | Rosetta                                |
@@ -703,6 +707,9 @@ The table below shows the progression of leading methods across CASP editions.
 | CASP12       | 2016 | 55         | RaptorX, Baker-Robetta                 |
 | CASP13       | 2018 | 65         | AlphaFold 1 (DeepMind)                 |
 | CASP14       | 2020 | **92.4**   | **AlphaFold 2 (DeepMind)**             |
+
+</div>
+</div>
 
 At CASP14, AlphaFold 2 achieved a median GDT-TS score of 92.4, drastically surpassing previous methods.  
 For many targets, predictions reached near-experimental accuracy, with Cα RMSD values close to 1 Å.
@@ -726,9 +733,9 @@ Additionally, AlphaFold 3 was evaluated on several CASP15 RNA targets (R1116, R1
 On the recent PDB low-homology subset, AlphaFold 3 consistently outperforms AlphaFold-Multimer v2.3. Improvements are observed across general protein–protein interfaces and are particularly pronounced for antibody–antigen complexes.
 
 <figure style="text-align: center;">
-  <img src="{{ '/assets/images/ProteinProtein.PNG' | relative_url }}" width="750">
+  <img src="{{ '/assets/images/ProteinProtein.JPG' | relative_url }}" width="750">
   <figcaption>
-    <strong>Figure 8:</strong> AlphaFold 3 improvements for protein–protein interactions compared to previous baselines (Abramson et al., 2024) <sup><a href="#ref7">[7]</a></sup>.
+    <strong>Figure 8:</strong> AlphaFold 3 improvements for protein–protein interactions(Abramson et al., 2024) <sup><a href="#ref7">[7]</a></sup>.
   </figcaption>
 </figure>
 
@@ -754,13 +761,6 @@ AlphaFold 2 established that deep learning could solve single-chain protein fold
 The empirical gains in protein–protein and protein–ligand benchmarks suggest as well that diffusion-based generative modeling provides improved robustness in structurally diverse systems.
 
 
-# Broader Implications
-
-Taken together, these results illustrated a conceptual shift.
-
-AlphaFold 2 established that deep learning could solve single-chain protein folding with near-experimental accuracy. AlphaFold 3 extended this paradigm towards a more unified interaction modeling across proteins, ligands, nucleic acids, and other biomolecular components.
-
-The empirical gains in protein–protein and protein–ligand benchmarks suggest as well that the diffusion-based generative modeling provideed improved robustness in structurally diverse systems.
 
 # Concluding Thoughts and Limitations
 
