@@ -27,7 +27,7 @@ We begin with the biological foundations before moving towards the deep learning
 4. [AlphaFold 2](#alphafold-2)  
 5. [AlphaFold 3](#alphafold-3)  
 6. [Experiments and Results](#experiments-and-results)  
-7. [Concluding Thoughts and Limitations](#concluding-thoughts)   
+7. [Concluding Thoughts and Limitations](#concluding-thoughts-and-limitations)   
 
 ---
 
@@ -118,7 +118,7 @@ $$
 
 If a protein were to explore all these conformations randomly, reaching its native structure would take longer than the age of the universe. Yet, in reality, many proteins fold within milliseconds to seconds.
 
-This apparent contradiction is known as **Levinthal’s Paradox**. It demonstrates that protein folding is not a random search through conformational space, but a highly constrained and guided physical process. Understanding this efficiency has been one of the central challenges of molecular biology and it is precisely this challenge that makes AlphaFold transformative.
+This apparent contradiction is known as **Levinthal’s Paradox**. It demonstrates that protein folding is not a random search through conformational space, but a highly constrained and guided physical process. Understanding this efficiency has been one of the central challenges of molecular biology, and it is precisely this challenge that makes AlphaFold transformative.
 
 ---
 
@@ -161,7 +161,7 @@ To enable fair comparison between prediction methods, the community established 
 
 Additional metrics such as **lDDT (local Distance Difference Test)** and **DockQ** are used to assess local structural accuracy and the quality of predicted molecular interfaces.
 
-In 2020 and 2022, AlphaFold dramatically outperformed previous approaches in CASP, surpassing the GDT accuracy of previous systems by a large margin. This marked a turning point in computational biology and set the stage for the deep learning revolution in protein structure prediction.
+In 2020 and 2022, AlphaFold drastically outperformed previous approaches in CASP, surpassing the GDT accuracy of previous systems by a large margin. This marked a turning point in computational biology and set the stage for the deep learning revolution in protein structure prediction.
 
 ---
 
@@ -319,7 +319,7 @@ $$
 
 is selected, and self-attention is applied along the sequence axis.
 
-This mechanism captures evolutionary variation at a specific residue position. Signals such as conservation, mutation patterns and co-evolution are extracted.
+This mechanism captures evolutionary variation at a specific residue position. Signals such as conservation, mutation patterns, and co-evolution are extracted.
 
 Column-wise attention therefore models how a structural position behaves across evolutionary time. Together, row and column attention allow the Evoformer to extract meaningful information from the evolution process.
 
@@ -683,7 +683,7 @@ This differs from AlphaFold 2, where torsion angles were predicted explicitly wi
 
 ## Summary of the Shift
 
-AlphaFold 2 produced nearly deterministic predictions for a given input sequence and it can be seen as a geometric solver in SE(3).
+AlphaFold 2 produced nearly deterministic predictions for a given input sequence, and it can be seen as a geometric solver in SE(3).
 
 AlphaFold 3 introduces stochastic sampling and is a generative model over atomic coordinates. Different initial noise realizations can yield different, yet physically plausible, conformations.
 
