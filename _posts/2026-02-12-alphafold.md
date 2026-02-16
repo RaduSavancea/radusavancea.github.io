@@ -729,9 +729,10 @@ Additionally, AlphaFold 3 was evaluated on several CASP15 RNA targets (R1116, R1
 
 On the recent PDB low-homology subset, AlphaFold 3 consistently outperforms AlphaFold-Multimer v2.3. Improvements are observed across general protein–protein interfaces and are particularly pronounced for antibody–antigen complexes.
 
-<figure style="text-align: center;">
-  <img src="{{ '/assets/images/ProteinProtein.JPG' | relative_url }}" style="width: 60%;">
-  <figcaption>
+<figure>
+  <img src="{{ '/assets/images/ProteinProtein.JPG' | relative_url }}"
+       style="width: 60%; display: block; margin: 0 auto;">
+  <figcaption style="text-align: center;">
     <strong>Figure 8:</strong> AlphaFold 3 improvements for protein–protein interactions (Abramson et al., 2024) <sup><a href="#ref7">[7]</a></sup>.
   </figcaption>
 </figure>
