@@ -99,7 +99,7 @@ Moreover, protein structures help interpret genetic variation and mutations. Man
 
 <figure style="text-align: center;">
   <img src="{{ '/assets/images/Corona.JPG' | relative_url }}" alt="Predicted protein structure example" width="450">
-  <figcaption><strong>Figure 3:</strong>  Human coronavirus OC43 spike protein (4,665 residues), heavily glycosylated and bound by neutralizing antibodies.</figcaption>
+  <figcaption><strong>Figure 3:</strong>  Human coronavirus OC43 spike protein (4,665 residues), heavily glycosylated and bound by neutralizing antibodies <sup><a href="#ref7">[7]</a></sup>.</figcaption>
 </figure>
 
 The ability to computationally predict accurate protein structures at scale fundamentally changes how we approach biology, medicine, and molecular engineering.
@@ -159,7 +159,7 @@ In 2020 and 2022, AlphaFold dramatically outperformed previous approaches in CAS
 ---
 
 *The next sections will explore the architecture of AlphaFold 2, including MSA feature extraction, the Evoformer, and the structure module, followed by the advances introduced in AlphaFold 3.*
-
+---
 
 # AlphaFold 2
 
@@ -532,6 +532,7 @@ AlphaFold 2 separates protein folding into three conceptual phases:
 
 This separation between high-dimensional relational reasoning and geometric knowledge is one of the central architectural innovations that enabled AlphaFold 2 to achieve near-experimental accuracy in CASP.
 
+---
 
 # AlphaFold 3 
 
@@ -566,6 +567,7 @@ However, both components have evolved.
 
 The architectural pattern remains similar: relational reasoning first, coordinate generation second. What changes is how geometry is produced.
 
+---
 
 ## A Unified Molecular Representation
 
@@ -671,7 +673,6 @@ Diffusion then adjusts global placement and interaction geometry.
 
 This differs from AlphaFold 2, where torsion angles were predicted explicitly within rigid residue frames. AlphaFold 3 moves closer to full atomic generative modeling.
 
-
 ---
 
 ## Summary of the Shift
@@ -689,7 +690,11 @@ This probabilistic formulation enables:
 
 The treatment of equivariance also evolves. In AlphaFold 2, SE(3)-equivariance was enforced explicitly through specialized architectural components such as IPA. In AlphaFold 3, rigid-body equivariance is encouraged statistically through a combination of equivariant conditioning and random rotation–translation data augmentation applied during training. Rather than hard-coding symmetry into attention updates, the model learns to respect geometric symmetries within the diffusion framework.
 
+---
+
 # Experiments and Results
+
+---
 
 ## Historical Context: CASP Performance Progression
 
@@ -713,6 +718,8 @@ For many targets, predictions reached near-experimental accuracy, with Cα RMSD 
 
 AlphaFold 3 extends this success beyond protein folding into full biomolecular interaction modeling.
 
+---
+
 ## Evaluation Datasets in AlphaFold 3
 
 Unlike AlphaFold 2, which was primarily evaluated on folding benchmarks such as CASP, AlphaFold 3 was tested on a broader range of interaction-focused datasets. The goal was not only to assess folding accuracy, but to evaluate how well the model predicts full molecular assemblies.
@@ -724,6 +731,9 @@ For antibody–antigen systems, a dedicated subset of 71 complexes (166 interfac
 Protein–ligand performance was evaluated using the PoseBusters benchmark (v1 and v2), which includes chemical validity checks, steric clash detection, and pocket-aligned ligand RMSD with a success threshold of < 2 Å. Crystallization artifacts and glycans were removed to ensure fair comparison.
 
 Additionally, AlphaFold 3 was evaluated on several CASP15 RNA targets (R1116, R1117, R1126, R1128, R1136, R1138, R1189, R1190) and compared against RF2NA and other RNA prediction systems <sup><a href="#ref7">[7]</a></sup>.
+
+
+---
 
 ## Protein–Protein Interactions
 
@@ -739,7 +749,7 @@ On the recent PDB low-homology subset, AlphaFold 3 consistently outperforms Alph
 
 ---
 
-# Protein–Ligand Prediction Improvements
+## Protein–Ligand Prediction Improvements
 
 Another striking advance mentioned in the results section of the AlphaFold 3 paper is its unified modeling of protein–ligand systems. Unlike traditional docking pipelines, AF3 does not require a predefined binding pocket and does not separate folding from docking. Instead, ligand poses are generated through the same diffusion process used for protein structure refinement.
 
@@ -750,7 +760,10 @@ Another striking advance mentioned in the results section of the AlphaFold 3 pap
   </figcaption>
 </figure>
 
-# Broader Implications
+---
+
+
+## Broader Implications
 
 Taken together, these results illustrate a conceptual shift.
 
@@ -758,7 +771,7 @@ AlphaFold 2 established that deep learning could solve single-chain protein fold
 
 The empirical gains in protein–protein and protein–ligand benchmarks suggest as well that diffusion-based generative modeling provides improved robustness in structurally diverse systems.
 
-
+---
 
 # Concluding Thoughts and Limitations
 
